@@ -143,6 +143,7 @@ int mxs_iomux_setup_multiple_pads(const iomux_cfg_t *pad_list, unsigned count)
 	mxs_reinit_all_pins();										/* all pins output, level 0 */
 	udelay(10000);												/* just turned of vccio, wait for 10ms to let peripherals shutdown */
 	gpio_direction_output(MX28_PAD_ENET0_COL__GPIO_4_14, 1);		/* switch on vccio_3v3 */
+	gpio_direction_output(MX28_PAD_LCD_D18__GPIO_1_18, 1);
 
 	for (i = 0; i < count; i++) {
 		ret = mxs_iomux_setup_pad(*p);
