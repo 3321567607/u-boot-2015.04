@@ -12,10 +12,6 @@
 
 #include <common.h>
 
-#if defined(CONFIG_MX28)
-#include <asm/arch/iomux-mx28.h>
-#endif
-
 /* TODO: can we just include all these headers whether needed or not? */
 #if defined(CONFIG_CMD_BEDBUG)
 #include <bedbug/type.h>
@@ -57,7 +53,6 @@
 #ifdef CONFIG_X86
 #include <asm/init_helpers.h>
 #endif
-#include <asm/gpio.h>
 #include <dm/root.h>
 #include <linux/compiler.h>
 #include <linux/err.h>
@@ -684,14 +679,6 @@ static int run_main_loop(void)
 #ifdef CONFIG_SANDBOX
 	sandbox_main_loop_init();
 #endif
-
-	/* gpio_3_30, high:emmc(default), low:tftp/nfs */
-	if (0 == gpio_get_value(MX28_PAD_LCD_RESET__GPIO_3_30)) {
-		setenv("bootcmd", "run netboot");
-	} else {
-		setenv("bootcmd", "run emmcboot");
-	}
-
 	/* main_loop() can return to retry autoboot, if so just run it again */
 	for (;;)
 		main_loop();
