@@ -14,7 +14,7 @@
 #include <asm/arch/imx-regs.h>
 #include <asm/arch/sys_proto.h>
 
-#define	MUX_CONFIG_SSP0	(MXS_PAD_3V3 | MXS_PAD_8MA | MXS_PAD_PULLUP)
+#define	MUX_CONFIG_SSP0	(MXS_PAD_3V3 | MXS_PAD_4MA | MXS_PAD_PULLUP)
 #define	MUX_CONFIG_SSP1	(MXS_PAD_3V3 | MXS_PAD_4MA | MXS_PAD_PULLUP)
 #define	MUX_CONFIG_GPMI	(MXS_PAD_3V3 | MXS_PAD_4MA | MXS_PAD_NOPULL)
 #define	MUX_CONFIG_ENET	(MXS_PAD_3V3 | MXS_PAD_4MA | MXS_PAD_PULLUP)
@@ -169,15 +169,20 @@ const iomux_cfg_t iomux_setup[] = {
 #define HW_DRAM_CTL29	(0x74 >> 2)
 #define CS_MAP		0xf
 #define COLUMN_SIZE	0x2
-#define ADDR_PINS	0x1
 #define APREBIT		0xa
 
-#define HW_DRAM_CTL29_CONFIG	(CS_MAP << 24 | COLUMN_SIZE << 16 | \
-					ADDR_PINS << 8 | APREBIT)
+#define ADDR_PINS_512M (0x0 << 8)
+#define ADDR_PINS_256M (0x1 << 8)
+
+#define HW_DRAM_CTL29_CONFIG	(CS_MAP << 24 | COLUMN_SIZE << 16 | APREBIT)
 
 void mxs_adjust_memory_params(uint32_t *dram_vals)
 {
-	dram_vals[HW_DRAM_CTL29] = HW_DRAM_CTL29_CONFIG;
+    if (gpio_get_value(MX28_PAD_GPMI_RDN__GPIO_0_24) != 0) {
+        dram_vals[HW_DRAM_CTL29] = HW_DRAM_CTL29_CONFIG | ADDR_PINS_512M;
+    } else {
+        dram_vals[HW_DRAM_CTL29] = HW_DRAM_CTL29_CONFIG | ADDR_PINS_256M;
+    }
 }
 
 void board_init_ll(const uint32_t arg, const uint32_t *resptr)
