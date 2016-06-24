@@ -149,6 +149,7 @@ int mxs_iomux_setup_multiple_pads(const iomux_cfg_t *pad_list, unsigned count)
 	gpio_direction_output(MX28_PAD_LCD_D22__GPIO_1_22, 1);      /* switch on 5v-in */
 	udelay(10000);												/* just turned of vccio, wait for 10ms to let peripherals shutdown */
 	gpio_direction_output(MX28_PAD_ENET0_COL__GPIO_4_14, 1);    /* switch on vccio_3v3 */
+	gpio_direction_output(MX28_PAD_GPMI_CE3N__GPIO_0_19, 1);    /* switch on blue-LED */
 
 	for (i = 0; i < count; i++) {
 		ret = mxs_iomux_setup_pad(*p);

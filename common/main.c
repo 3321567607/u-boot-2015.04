@@ -12,6 +12,7 @@
 #include <cli.h>
 #include <version.h>
 
+
 DECLARE_GLOBAL_DATA_PTR;
 
 /*
@@ -52,6 +53,8 @@ static void run_preboot_environment_command(void)
 #endif /* CONFIG_PREBOOT */
 }
 
+extern void check_pwrup_src(void);
+
 /* We come here after U-Boot is initialised and ready to process commands */
 void main_loop(void)
 {
@@ -78,6 +81,7 @@ void main_loop(void)
 	update_tftp(0UL);
 #endif /* CONFIG_UPDATE_TFTP */
 
+	check_pwrup_src();
 	s = bootdelay_process();
 	if (cli_process_fdt(&s))
 		cli_secure_boot_cmd(s);
