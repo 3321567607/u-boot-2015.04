@@ -307,6 +307,8 @@ __weak void mx28_adjust_mac(int dev_id, unsigned char *mac)
 	mac[2] = 0x9f;
 }
 
+unsigned int cpusn_hi;
+unsigned int cpusn_lo;
 #ifdef	CONFIG_MX28_FEC_MAC_IN_OCOTP
 
 #define	MXS_OCOTP_MAX_TIMEOUT	1000000
@@ -326,10 +328,10 @@ void imx_get_mac_from_fuse(int dev_id, unsigned char *mac)
 		return;
 	}
 
-	//data = readl(&ocotp_regs->hw_ocotp_ops3);
+	cpusn_hi = readl(&ocotp_regs->hw_ocotp_ops3);
 	//printf("unique_key_ops3: 0x%x\n", data);
 
-	data = readl(&ocotp_regs->hw_ocotp_ops2);
+	cpusn_lo = data = readl(&ocotp_regs->hw_ocotp_ops2);
 	//printf("unique_key_ops2: 0x%x\n", data);
 
 	//mac[2] = (data >> 24) & 0xff;

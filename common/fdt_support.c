@@ -445,6 +445,8 @@ int fdt_fixup_memory(void *blob, u64 start, u64 size)
 	return fdt_fixup_memory_banks(blob, &start, &size, 1);
 }
 
+extern unsigned int cpusn_hi;
+extern unsigned int cpusn_lo;
 void fdt_fixup_ethernet(void *fdt)
 {
 	int node, i, j;
@@ -490,6 +492,12 @@ void fdt_fixup_ethernet(void *fdt)
 
 		sprintf(mac, "eth%daddr", ++i);
 	}
+
+	sprintf(enet, "%08x", cpusn_hi);
+	do_fixup_by_path(fdt, "/cpus/cpu", "cpusn-hi", &enet, 9, 1);
+	sprintf(enet, "%08x", cpusn_lo);
+	do_fixup_by_path(fdt, "/cpus/cpu", "cpusn-lo", &enet, 9, 1);
+	
 }
 
 /* Resize the fdt to its actual size + a bit of padding */
