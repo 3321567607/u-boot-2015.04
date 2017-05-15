@@ -178,11 +178,7 @@ const iomux_cfg_t iomux_setup[] = {
 
 void mxs_adjust_memory_params(uint32_t *dram_vals)
 {
-    if (gpio_get_value(MX28_PAD_GPMI_RDN__GPIO_0_24) != 0) {
-        dram_vals[HW_DRAM_CTL29] = HW_DRAM_CTL29_CONFIG | ADDR_PINS_512M;
-    } else {
-        dram_vals[HW_DRAM_CTL29] = HW_DRAM_CTL29_CONFIG | ADDR_PINS_256M;
-    }
+    dram_vals[HW_DRAM_CTL29] = HW_DRAM_CTL29_CONFIG | ADDR_PINS_256M;
 }
 
 void board_init_ll(const uint32_t arg, const uint32_t *resptr)

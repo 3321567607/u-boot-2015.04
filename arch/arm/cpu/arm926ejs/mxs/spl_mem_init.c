@@ -259,8 +259,10 @@ static void mxs_mem_setup_vdda(void)
 		&power_regs->hw_power_vddactrl);
 }
 
+#define TEST_MEMORY 0
 //#define TEST_MEMORY 1
 
+#define MEMSIZE_128M 0x2000000
 #define MEMSIZE_256M 0x4000000
 #define MEMSIZE_512M 0x8000000
 
@@ -284,19 +286,41 @@ uint32_t mxs_mem_get_size(void)
 	vt[4] = da;
 
 #if TEST_MEMORY
-    (0 != gpio_get_value(MX28_PAD_GPMI_RDN__GPIO_0_24)) ? (memsize = MEMSIZE_512M) : (memsize = MEMSIZE_512M);
+    // (0 != gpio_get_value(MX28_PAD_GPMI_RDN__GPIO_0_24)) ? (memsize = MEMSIZE_512M) : (memsize = MEMSIZE_512M);
+    memsize = MEMSIZE_128M;
     printf("TEST: writing 0x%x bytes...\r\n", memsize << 2);
     for (i = 0; i < memsize; i++) {
+#if 1
          *((unsigned int *)(PHYS_SDRAM_1 + (i<<2)))= i | 0xA0000000;
+#else
+        if (i & 1)
+             *((unsigned int *)(PHYS_SDRAM_1 + (i<<2)))= 0xA5A5A5A5/*i | 0xA0000000*/;
+        else
+            *((unsigned int *)(PHYS_SDRAM_1 + (i<<2)))= 0x5A5A5A5A;
+#endif
     }
 
     printf("TEST: reading 0x%x bytes...\r\n", memsize << 2);
     for (i = 0; i < memsize; i++) {
         val = *((unsigned int *)(PHYS_SDRAM_1 + (i<<2)));
+#if 1
         if (val != (i | 0xA0000000)) {
             printf("addr: 0x%x,", i);
             printf(" val: 0x%x\r\n", val);
         }
+#else
+        if (i & 1) {
+            if (val != 0xA5A5A5A5) {
+                printf("addr: 0x%x,", i);
+                printf(" val: 0x%x\r\n", val);
+            }
+        } else {
+            if (val != 0x5A5A5A5A) {
+                printf("addr: 0x%x,", i);
+                printf(" val: 0x%x\r\n", val);
+            }
+        }
+#endif
     }
     printf("TEST: OK done!\r\n");
 #endif

@@ -85,14 +85,21 @@ static int mx28evk_mmc_wp(int id)
 int board_mmc_init(bd_t *bis)
 {
 	/* Configure WP as input */
-	//gpio_direction_input(MX28_PAD_SSP1_SCK__GPIO_2_12);
+	gpio_direction_input(MX28_PAD_LCD_D01__GPIO_1_1);
+    mdelay(10);
 
 	/* Configure MMC0 Power Enable */
 	//gpio_direction_output(MX28_PAD_PWM3__GPIO_3_28, 0);
 
-	return mxsmmc_initialize(bis, 0, mx28evk_mmc_wp, NULL);
-
-	//return mxsmmc_initialize(bis, 1, mx28evk_mmc_wp, NULL);
+    if (gpio_get_value(MX28_PAD_LCD_D01__GPIO_1_1)) {
+        /* LCD_D1 hi, power up from emmc */
+        puts("boot from emmc\n");
+        return mxsmmc_initialize(bis, 1, mx28evk_mmc_wp, NULL);
+    } else {
+        /* LCD_D1 lo, power up from sd card */
+        puts("boot from sd card\n");
+    	return mxsmmc_initialize(bis, 0, mx28evk_mmc_wp, NULL);
+    }
 }
 #endif
 

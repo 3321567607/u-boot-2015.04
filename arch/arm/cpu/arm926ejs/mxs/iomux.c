@@ -102,15 +102,12 @@ static void mxs_reinit_all_pins(void)
 	ofs = MXS_PINCTRL_BASE + 0x1c0; writel(0x3fffffff, ofs);/* [BANK - 6]	MUX_12 : PIN-00 ~ 14, bit 30-31, 2 bits reserved. all disabled */
 	ofs = MXS_PINCTRL_BASE + 0x1d0; writel(0x0003ffff, ofs);/* 			MUX_13 : PIN-16 ~ 24, bit 18-31, 14 bits reserved. all disabled */
 	/* set all output value as 0, except:
-	 *     gpio_0_26, 1: turn off fec 3v3
-	 *     gpio_1_23, 1: disable watch dog
-	 *     gpio_3_28, 1: turn on vbat_gsm
 	 */
-	dout = MXS_PINCTRL_BASE + 0x700; writel(0x04000000, dout);
-	dout = MXS_PINCTRL_BASE + 0x710; writel(0x00800000, dout);
-	dout = MXS_PINCTRL_BASE + 0x720; writel(0, dout);
-	dout = MXS_PINCTRL_BASE + 0x730; writel(0x10000000, dout);
-	dout = MXS_PINCTRL_BASE + 0x740; writel(0, dout);
+	dout = MXS_PINCTRL_BASE + 0x700; writel(0x00000000, dout);
+	dout = MXS_PINCTRL_BASE + 0x710; writel(0x00000000, dout);
+	dout = MXS_PINCTRL_BASE + 0x720; writel(0x00000000, dout);
+	dout = MXS_PINCTRL_BASE + 0x730; writel(0x00000000, dout);
+	dout = MXS_PINCTRL_BASE + 0x740; writel(0x00000000, dout);
 
 #if 0
 	/* config all pins as input, except: i2c0-clk i2c0-data as output-level0 */
@@ -123,7 +120,7 @@ static void mxs_reinit_all_pins(void)
 	/* config all pins as output */
 	/*doe_ofs = MXS_PINCTRL_BASE + 0xb04; writel(0x1fff00ff, doe_ofs);*/ /* set */
 	doe_ofs = MXS_PINCTRL_BASE + 0xb04; writel(0x1fff00ff, doe_ofs); /* set */
-	doe_ofs = MXS_PINCTRL_BASE + 0xb10; writel(0xff7fffff, doe_ofs); /* gpio_1_23 input, disable WD */
+	doe_ofs = MXS_PINCTRL_BASE + 0xb10; writel(0xffffffff, doe_ofs);
 	doe_ofs = MXS_PINCTRL_BASE + 0xb20; writel(0x0fffffff, doe_ofs);
 	doe_ofs = MXS_PINCTRL_BASE + 0xb30; writel(0x7fffffff, doe_ofs);
 	doe_ofs = MXS_PINCTRL_BASE + 0xb40; writel(0x001fffff, doe_ofs);
@@ -145,11 +142,7 @@ int mxs_iomux_setup_multiple_pads(const iomux_cfg_t *pad_list, unsigned count)
 	int ret;
 
 	mxs_reinit_all_pins();										/* all pins output, level 0 */
-	gpio_direction_input(MX28_PAD_GPMI_CE0N__GPIO_0_16);		/* tca6416 INT pin, input, must be before vccio_3v3 */
-	gpio_direction_output(MX28_PAD_LCD_D22__GPIO_1_22, 1);      /* switch on 5v-in */
 	udelay(10000);												/* just turned of vccio, wait for 10ms to let peripherals shutdown */
-	gpio_direction_output(MX28_PAD_ENET0_COL__GPIO_4_14, 1);    /* switch on vccio_3v3 */
-	gpio_direction_output(MX28_PAD_GPMI_CE3N__GPIO_0_19, 1);    /* switch on blue-LED */
 
 	for (i = 0; i < count; i++) {
 		ret = mxs_iomux_setup_pad(*p);
@@ -158,8 +151,6 @@ int mxs_iomux_setup_multiple_pads(const iomux_cfg_t *pad_list, unsigned count)
 		p++;
 	}
 	gpio_direction_output(MX28_PAD_GPMI_RESETN__GPIO_0_28, 1);	/* keep emmc reset high, not reset */
-    gpio_direction_input(MX28_PAD_GPMI_RDN__GPIO_0_24);         /* 0_24 input, high:512M DDR, low:256M */
-	gpio_direction_input(MX28_PAD_LCD_RESET__GPIO_3_30);        /* 3_30 input, high:boot-emmc, low:boot-tftp/nfs */
 
 	return 0;
 }

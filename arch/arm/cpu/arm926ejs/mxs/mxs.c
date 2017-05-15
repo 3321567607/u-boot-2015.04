@@ -40,16 +40,6 @@ static void power_down(int reset)
 	else
 		writel(RTC_PERSISTENT0_AUTO_RESTART, &rtc_regs->hw_rtc_persistent0_set);
 
-	/* shutdown FEC_3V3 */
-	gpio_direction_output(MX28_PAD_GPMI_ALE__GPIO_0_26, 1);
-	/* shutdown USB0/1_PWR_EN */
-	gpio_direction_output(MX28_PAD_ENET0_TXD2__GPIO_4_11, 0);
-	gpio_direction_output(MX28_PAD_ENET0_TXD3__GPIO_4_12, 0);
-	/* shutdown vbat_gsm */
-	gpio_direction_output(MX28_PAD_PWM3__GPIO_3_28, 0);
-	mdelay(100);
-	/* shutdown vccio_3v3 */
-	gpio_direction_output(MX28_PAD_ENET0_COL__GPIO_4_14, 0);
 	mdelay(100);
 	/* power down chip */
     writel(POWER_RESET_UNLOCK_KEY | 1, &pwr_regs->hw_power_reset);
@@ -61,12 +51,15 @@ static void power_down(int reset)
 
 void bootm_extra(void)
 {
-	gpio_direction_output(MX28_PAD_GPMI_CE3N__GPIO_0_19, 0);    /* switch off blue-LED */
-	gpio_direction_output(MX28_PAD_LCD_D19__GPIO_1_19, 1);    /* switch on yellow-LED */
+#if 0
+	gpio_direction_output(MX28_PAD_GPMI_CE3N__GPIO_0_19, 0);   /* switch off blue-LED */
+	gpio_direction_output(MX28_PAD_LCD_D19__GPIO_1_19, 1);     /* switch on yellow-LED */
+#endif
 }
 
 void check_pwrup_src(void)
 {
+#if 0
 	struct mxs_rtc_regs   *rtc_regs = (struct mxs_rtc_regs   *)MXS_RTC_BASE;
 
 	if (readl(&rtc_regs->hw_rtc_persistent0) & RTC_PERSISTENT0_EXTERNAL_RESET) {
@@ -76,6 +69,7 @@ void check_pwrup_src(void)
 		while (1)
 			getc();
 	}
+#endif
 }
 
 #if 1
@@ -131,6 +125,7 @@ void enable_caches(void)
 
 void check_power_mode(void)
 {
+#if 0
 	uint32_t pwr_state;
 	struct mxs_power_regs *pwr_regs = (struct mxs_power_regs *)MXS_POWER_BASE;
 
@@ -141,6 +136,7 @@ void check_power_mode(void)
 			do_powerdown(0, 0, 0, 0);
 		}
 	}
+#endif
 }
 
 
